@@ -3,24 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
 <title>Amala Bharadwaj</title>
+<meta name="description" content="ML and RL engineer. I measure whether code benchmarks can be passed without solving the task.">
 <style>
   body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
-         max-width: 34rem; margin: 4rem auto; padding: 0 1.5rem;
+         max-width: 40rem; margin: 4rem auto; padding: 0 1.5rem;
          line-height: 1.6; color: #1a1a1a; background: #fff; }
   h1 { font-size: 1.5rem; font-weight: 600; margin: 0 0 .25rem; }
   p.meta { margin: 0 0 .25rem; color: #444; }
+  p.lede { margin: 1.4rem 0 0; }
   a { color: #14548c; }
   h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em;
-       color: #666; font-weight: 600; margin: 2.5rem 0 .6rem; }
+       color: #666; font-weight: 600; margin: 2.6rem 0 .6rem; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 1.6rem 0 .3rem; }
   ul { list-style: none; padding: 0; margin: 0; }
   li { margin-bottom: .45rem; }
+  p.proj { margin: .3rem 0 .4rem; }
+  p.links { margin: .3rem 0 0; font-size: .92rem; }
+  span.status { color: #666; font-size: .92rem; }
   @media (prefers-color-scheme: dark) {
     body { background: #111; color: #e8e8e8; }
     p.meta { color: #b0b0b0; }
     a { color: #7fb4e0; }
     h2 { color: #999; }
+    span.status { color: #a0a0a0; }
   }
 </style>
 </head>
@@ -28,17 +34,74 @@
 
 <h1>Amala Bharadwaj</h1>
 <p class="meta">Student, West Valley College</p>
-<p class="meta"><a href="mailto:abharad7@mywvm.wvm.edu">abharad7@mywvm.wvm.edu</a></p>
+<p class="meta"><a href="mailto:amalabharadwaj@gmail.com">amalabharadwaj@gmail.com</a> &middot; <a href="https://github.com/Amala-Bharadwaj">github.com/Amala-Bharadwaj</a></p>
 
-<h2>Links</h2>
-<ul>
-  <li><a href="https://github.com/Amala-Bharadwaj">github.com/Amala-Bharadwaj</a></li>
-</ul>
+<p class="lede">I build reinforcement learning agents and the tooling that checks
+whether their rewards can be gamed. Most of what I do is measurement. When a
+model is graded by a test suite, passing is assumed to mean solving, and I
+measure how often that is wrong.</p>
 
 <h2>Open source</h2>
 <ul>
   <li><a href="https://github.com/Farama-Foundation/Gymnasium/pull/1662">Gymnasium #1662</a>, trained-policy GIFs for the MuJoCo documentation (merged)</li>
-  <li><a href="https://github.com/Farama-Foundation/PettingZoo/pull/1415">PettingZoo #1415</a>, FlattenObservation wrappers (open)</li>
+  <li><a href="https://github.com/Farama-Foundation/PettingZoo/pull/1415">PettingZoo #1415</a>, FlattenObservation wrappers ported from SuperSuit (open)</li>
+</ul>
+
+<h2>Work</h2>
+
+<h3>Reward-hacking auditor</h3>
+<p class="proj">Measures whether a test suite can be passed without solving the
+task. A local 7B model, given only the problem and its three published tests,
+writes code that passes without solving on 36% of 890 MBPP problems. The standard
+fix is to add more held-out tests drawn the same way. I replayed all 857
+model-written false positives and sorted them by which region of the input space
+they are actually wrong on. Held-out tests remove 67.0% of the failures that live
+on ordinary inputs and 3.9% of the ones that live only on empty input or zero, so
+the defence works on the failures the suite could already catch and concentrates
+the ones it never looks at. Four models, roughly 8,900 generation attempts each,
+scored against an independent oracle built from EvalPlus rather than my own
+fuzzer. Pre-registered, with both bugs found since and one wrong prediction left
+standing in the record.</p>
+<p class="links"><a href="https://github.com/Amala-Bharadwaj/reward-hacking-auditor">Code and full results</a> &middot; <span class="status">paper in revision</span></p>
+
+<h3>Learned-guide search for Rush Hour</h3>
+<p class="proj">Asks whether a learned action-value function orders search better
+than a hand-designed heuristic. A two-tower Q(s,a) network is regressed on exact
+breadth-first-search distances, then fine-tuned with Double DQN under three
+potential-based reward forms including Ng-Harada-Russell shaping. Five-fold
+cross-validation over 150 instances, every instance held out exactly once, three
+seeds. The supervised guide solves 132 &plusmn; 2 of 150 held-out instances at
+115,000 &plusmn; 7,000 nodes against the hand-tuned potential's 104 at 190,192, so
+28 more instances with 40% fewer nodes. Reinforcement learning fine-tuning gives
+no measurable further gain over 15 fold-runs, which overturned my own earlier
+result from a single unseeded run. I also ablated all ten terms of the heuristic
+and found one that never fires on the corpus, so its weight had never been
+tested.</p>
+<p class="links"><a href="https://github.com/Amala-Bharadwaj/Rush-Hour-RL-Algorithm">Code</a> &middot; <span class="status">paper draft</span></p>
+
+<h3>Buoy siting evaluator</h3>
+<p class="proj">A function that scores any location in US waters for how much a
+new NOAA weather buoy there would tell you that the existing network does not.
+Decorrelation lengths measured from hourly records across 163 scored stations.
+Wave height decorrelates over 780 to 838 km in every basin while wind runs 343 km
+in the Pacific against 542 in the Atlantic, so how far apart stations should sit
+depends on which variable you want to know. A 34,709-point quarter-degree
+candidate grid over five regional boxes, filtered to 21,006 feasible sites using
+depth and distance bounds taken from the 1st and 99th percentiles of the existing
+moored fleet.</p>
+<p class="links"><span class="status">in progress, scoring function not yet fixed</span></p>
+
+<h3>Congestion potential search</h3>
+<p class="proj">A potential-guided local search for Rush Hour. A ten-term
+congestion potential over board configurations, proven zero exactly when the
+puzzle is solved and verified over 192,824 reachable states with no
+violations.</p>
+<p class="links"><a href="https://github.com/Amala-Bharadwaj/Rush-Hour-CPS-Algorithm">Code</a></p>
+
+<h2>Contact</h2>
+<ul>
+  <li><a href="mailto:amalabharadwaj@gmail.com">amalabharadwaj@gmail.com</a></li>
+  <li><a href="https://github.com/Amala-Bharadwaj">github.com/Amala-Bharadwaj</a></li>
 </ul>
 
 </body>
